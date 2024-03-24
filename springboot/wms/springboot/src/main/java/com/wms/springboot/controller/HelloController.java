@@ -1,13 +1,17 @@
 package com.wms.springboot.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.wms.springboot.common.BeanCopyUtils;
 import com.wms.springboot.common.QueryPageParam;
 import com.wms.springboot.common.Result;
+import com.wms.springboot.common.ReturnData;
 import com.wms.springboot.entity.Menu;
 import com.wms.springboot.entity.User;
+import com.wms.springboot.entity.vo.UserVo;
 import com.wms.springboot.service.UserService;
 import com.wms.springboot.service.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/user")
@@ -43,6 +48,16 @@ public class HelloController {
         //return userService.list();
         //下行代码和上行代码功能相同，只是学习使用
         return userService.listAll();
+    }
+
+    @PostMapping("/list")
+    public Result listVo(){
+        //return userService.list();
+        //下行代码和上行代码功能相同，只是学习使用
+        List<User> users = userService.listAll();
+        List<UserVo> userVos = BeanCopyUtils.copyBeanList(users, UserVo.class);
+//        List<UserVo> userVos = BeanCopyUtils.copyBeanList(userPage.getRecords(), UserVo.class);
+        return Objects.nonNull(userVos)?Result.sucData(userVos):Result.fail();
     }
 
     //新增
@@ -103,6 +118,7 @@ public class HelloController {
         String name = (String) param.get("name");
         String sex = (String) param.get("sex");
         String roleId = (String) param.get("roleId");
+        String dormitoryNum = (String) param.get("dormitoryNum");
 
         //下列三行功能相同
         //Page<User> page = new Page<>(1,10);
@@ -124,6 +140,10 @@ public class HelloController {
 
         if (StringUtils.isNotBlank(roleId) && !"null".equals(roleId)){
             lambdaQueryWrapper.eq(User::getRoleId,(String)param.get("roleId"));
+        }
+
+        if (StringUtils.isNotBlank(dormitoryNum) && !"null".equals(dormitoryNum)){
+            lambdaQueryWrapper.eq(User::getDormitoryNum,(String)param.get("dormitoryNum"));
         }
 
 
@@ -160,5 +180,76 @@ public class HelloController {
         }
         return Result.fail();
     }
+    @PostMapping("/numIsNull")
+    public Result numIsNull(@RequestBody QueryPageParam queryPageParam){
+//        System.out.println("执行null函数");
+        System.out.println(queryPageParam);
+        //其它数据
+        HashMap param = queryPageParam.getParam();
 
+        String name = (String) param.get("name");
+        String sex = (String) param.get("sex");
+        String roleId = (String) param.get("roleId");
+        //下列三行功能相同
+        //Page<User> page = new Page<>(1,10);
+        //page.setCurrent(1);
+        //page.setSize(10);
+
+        Page<User> page = new Page<>();
+        page.setCurrent(queryPageParam.getPageNum());
+        page.setSize(queryPageParam.getPageSize());
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.isNull(User::getDormitoryNum);
+        if (StringUtils.isNotBlank(name) && !"null".equals(name)){
+            lambdaQueryWrapper.like(User::getName,(String)param.get("name"));
+        }
+
+        if (StringUtils.isNotBlank(sex) && !"null".equals(sex)){
+            lambdaQueryWrapper.eq(User::getSex,(String)param.get("sex"));
+        }
+
+        if (StringUtils.isNotBlank(roleId) && !"null".equals(roleId)){
+            lambdaQueryWrapper.eq(User::getRoleId,(String)param.get("roleId"));
+        }
+
+
+        IPage result = userService.page(page,lambdaQueryWrapper);
+
+        System.out.println("total==="+result.getTotal());
+        return Result.result(200,"成功",result.getTotal(),result.getRecords());
+        //return Result.result(200,"成功",0L,result.getRecords());
+    }
+
+    @GetMapping("/clearDorNum")
+    public Result clearDorNum(@RequestParam Integer id){
+//        System.out.println("执行null函数");
+        System.out.println(id);
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId,id).set(User::getDormitoryNum, null);
+        // 或者使用 updateWrapper.set(User::getFieldName, "");
+
+        boolean affectedRows = userService.update(null, updateWrapper);
+        // 处理更新结果
+        return affectedRows?Result.success():Result.fail();
+    }
+
+    @PostMapping("/addDorNum")
+    public Result addDorNum(@RequestBody ReturnData returnData){
+        System.out.println("执行add函数");
+        System.out.println(returnData);
+//        System.out.println(returnData);
+        HashMap param = returnData.getParam();
+
+        String id = param.get("id").toString();
+        String dormitoryNum = param.get("dormitoryNum").toString();
+
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId,id).set(User::getDormitoryNum, dormitoryNum);
+        // 或者使用 updateWrapper.set(User::getFieldName, "");
+
+        boolean affectedRows = userService.update(null, updateWrapper);
+        // 处理更新结果
+        return affectedRows?Result.success():Result.fail();
+    }
 }

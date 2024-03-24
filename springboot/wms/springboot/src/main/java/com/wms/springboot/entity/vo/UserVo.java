@@ -1,16 +1,14 @@
-package com.wms.springboot.entity;
+package com.wms.springboot.entity.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.wms.springboot.entity.User;
 import lombok.Data;
 
 @Data
-@TableName(value = "user")
-public class User {
+public class UserVo{
     private int id;
     private String num;
     private String name;
-    private String password;
     private int age;
     private int sex;
     private String phone;
@@ -21,6 +19,6 @@ public class User {
     //对应数据库字段
     @TableField("is_valid")
     private String isValid;
-    @TableField("dormitory_num")
+
     private String dormitoryNum;
 }

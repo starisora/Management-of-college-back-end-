@@ -48,7 +48,9 @@ public class CodeGenerator {
         // 全局配置
         GlobalConfig gc = new GlobalConfig();
         String projectPath = System.getProperty("user.dir");
-        gc.setOutputDir(projectPath + "/mybatisPlusGeneratorCode/src/main/java");
+//        gc.setOutputDir(projectPath + "/mybatisPlusGeneratorCode/src/main/java");
+        gc.setOutputDir(projectPath + "/springboot/wms/springboot/src/main/java");
+
         gc.setAuthor("starisora");
         gc.setOpen(false);
         // gc.setSwagger2(true); 实体属性 Swagger2 注解
@@ -56,7 +58,7 @@ public class CodeGenerator {
 
         // 数据源配置
         DataSourceConfig dsc = new DataSourceConfig();
-        dsc.setUrl("jdbc:mysql://localhost:3306/managerservesql?useUnicode=true&useSSL=false&characterEncoding=utf8");
+        dsc.setUrl("jdbc:mysql://localhost:3306/college_manager?useUnicode=true&useSSL=false&characterEncoding=utf8");
         // dsc.setSchemaName("public");
         dsc.setDriverName("com.mysql.cj.jdbc.Driver");
         dsc.setUsername("root");
@@ -66,7 +68,8 @@ public class CodeGenerator {
         // 包配置
         PackageConfig pc = new PackageConfig();
 //        pc.setModuleName(scanner("模块名"));
-        pc.setParent("com.baomidou.ant");
+//        pc.setParent("com.baomidou.ant");
+        pc.setParent("com.wms.springboot");
         mpg.setPackageInfo(pc);
 
         // 自定义配置
@@ -89,7 +92,9 @@ public class CodeGenerator {
             @Override
             public String outputFile(TableInfo tableInfo) {
                 // 自定义输出文件名 ， 如果你 Entity 设置了前后缀、此处注意 xml 的名称会跟着发生变化！！
-                return projectPath + "/mybatisPlusGeneratorCode/src/main/resources/mapper/" + pc.getModuleName()
+//                return projectPath + "/mybatisPlusGeneratorCode/src/main/resources/mapper/" + pc.getModuleName()
+//                        + "/" + tableInfo.getEntityName() + "Mapper" + StringPool.DOT_XML;
+                return projectPath + "/springboot/wms/springboot/src/main/resources/mapper/" + pc.getModuleName()
                         + "/" + tableInfo.getEntityName() + "Mapper" + StringPool.DOT_XML;
             }
         });
